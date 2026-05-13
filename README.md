@@ -1,26 +1,28 @@
 # bai3-ltw-archive
 
-# Product Management Website
+# Quản lý sản phẩm - PHP thuần
 
 Website quản lý sản phẩm được xây dựng bằng PHP thuần và MySQL.
 
 ## Chức năng
 
-- Đăng nhập quản trị
 - Quản lý sản phẩm
-  - Thêm sản phẩm
-  - Sửa sản phẩm
-  - Xóa sản phẩm
+  - Thêm, sửa, xóa sản phẩm
   - Tìm kiếm sản phẩm
+  - Upload ảnh sản phẩm
 - Quản lý danh mục
 - Quản lý nhà cung cấp
-- Quản lý đơn hàng
-- Upload ảnh sản phẩm
 - Thống kê:
   - Tổng sản phẩm
-  - Tổng đơn hàng
   - Top 3 sản phẩm bán chạy
   - Sản phẩm sắp hết hàng
+  - Lịch sử thay đổi giá
+
+## Cài đặt
+
+1. Copy thư mục vào `C:\xampp\htdocs\`
+2. Import file `sql/database.sql` vào phpMyAdmin
+3. Truy cập `http://localhost/bai3php`
 
 ## Công nghệ sử dụng
 
@@ -29,7 +31,6 @@ Website quản lý sản phẩm được xây dựng bằng PHP thuần và MySQ
 - HTML5
 - CSS3
 - JavaScript
-- Bootstrap 5
 
 ## Cấu trúc thư mục
 project/
@@ -53,11 +54,6 @@ project/
 │   │   ├── create.php
 │   │   ├── edit.php
 │   │   └── delete.php
-│   │
-│   └── orders/
-│       ├── index.php
-│       ├── detail.php
-│       └── delete.php
 │
 ├── assets/
 │   ├── css/

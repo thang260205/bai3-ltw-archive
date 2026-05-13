@@ -1,0 +1,32 @@
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP
+.env
+.env.local
+config/local.php
+
+# Node (if using npm)
+node_modules/
+npm-debug.log
+
+# Logs
+*.log
+
+# Dependencies
+vendor/
+composer.lock
+
+# Upload temporary files
+assets/uploads/temp/
+
+# Cache
+.cache/
+tmp/

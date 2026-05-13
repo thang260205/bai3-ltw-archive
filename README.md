@@ -2,18 +2,31 @@
 
 
 project/
-│
 ├── admin/
+│   ├── dashboard.php
+│   │
 │   ├── products/
 │   │   ├── index.php
 │   │   ├── create.php
 │   │   ├── edit.php
-│   │   ├── delete.php
+│   │   └── delete.php
 │   │
 │   ├── categories/
+│   │   ├── index.php
+│   │   ├── create.php
+│   │   ├── edit.php
+│   │   └── delete.php
+│   │
 │   ├── suppliers/
-│   ├── orders/
-│   └── dashboard.php
+│   │   ├── index.php
+│   │   ├── create.php
+│   │   ├── edit.php
+│   │   └── delete.php
+│   │
+│   └── orders/
+│       ├── index.php
+│       ├── detail.php
+│       └── delete.php
 │
 ├── assets/
 │   ├── css/
@@ -29,12 +42,6 @@ project/
 │   ├── footer.php
 │   ├── navbar.php
 │   └── sidebar.php
-│
-├── models/
-│   ├── Product.php
-│   ├── Category.php
-│   ├── Supplier.php
-│   └── Order.php
 │
 ├── sql/
 │   └── database.sql

@@ -2,13 +2,13 @@
 include '../../config/database.php';
 /** @var mysqli $conn */
 
-// Kiểm tra có id không
-if (empty($_GET['id'])) {
+// Kiểm tra bảo mật: Phải là method POST và có id
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['id'])) {
     header("Location: index.php");
     exit();
 }
 
-$id = intval($_GET['id']);
+$id = intval($_POST['id']);
 
 // Lấy thông tin sản phẩm để xóa file ảnh
 $sql = "SELECT hinh_anh FROM san_pham WHERE ma_san_pham = $id";

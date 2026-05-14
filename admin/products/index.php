@@ -249,7 +249,10 @@ include '../../includes/sidebar.php';
                             <td class="inner-center">
                                 <div class="inner-buttons">
                                     <a href="edit.php?id=<?php echo $row['ma_san_pham']; ?>" class="inner-edit"><i class="fas fa-edit"></i></a>
-                                    <a href="javascript:void(0);" class="inner-delete" onclick="confirmDelete(<?php echo $row['ma_san_pham']; ?>)"><i class="fas fa-trash"></i></a>
+                                    <form action="delete.php" method="POST" style="display: flex; margin: 0;">
+                                        <input type="hidden" name="id" value="<?php echo $row['ma_san_pham']; ?>">
+                                        <button type="button" class="inner-delete" onclick="confirmDeleteForm(this)" style="border: 0;"><i class="fas fa-trash"></i></button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -289,7 +292,7 @@ include '../../includes/sidebar.php';
 </main>
 
 <script>
-function confirmDelete(id) {
+function confirmDeleteForm(btn) {
     Swal.fire({
         title: 'Bạn có chắc chắn?',
         text: "Sản phẩm này và lịch sử giá sẽ bị xóa vĩnh viễn!",
@@ -301,7 +304,7 @@ function confirmDelete(id) {
         cancelButtonText: 'Hủy'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'delete.php?id=' + id;
+            btn.closest('form').submit();
         }
     });
 }

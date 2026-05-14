@@ -53,7 +53,6 @@ if (isset($_POST['btn_save'])) {
         }
     }
     
-    // Kiểm tra dữ liệu bắt buộc
     if (empty($ten_san_pham)) {
         $error = "Vui lòng nhập tên sản phẩm";
     } elseif (empty($gia) || $gia <= 0) {

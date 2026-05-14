@@ -35,7 +35,55 @@ elseif ($sort === 'stock_asc') $order_sql = "ORDER BY sp.ton_kho ASC";
 elseif ($sort === 'stock_desc') $order_sql = "ORDER BY sp.ton_kho DESC";
 elseif ($sort === 'best_seller') $order_sql = "ORDER BY sp.so_luong_ban DESC";
 
-// Truy vấn danh sách sản phẩm (có áp dụng Filter & Sort)
+// Xử lý Xuất Excel (CSV)
+if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    $sql_export = "
+        SELECT sp.*, dm.ten_danh_muc, ncc.ten_ncc, dv.ten_don_vi 
+        FROM san_pham sp 
+        LEFT JOIN danh_muc dm ON sp.ma_danh_muc = dm.ma_danh_muc
+        LEFT JOIN nha_cung_cap ncc ON sp.ma_ncc = ncc.ma_ncc
+        LEFT JOIN don_vi dv ON sp.ma_don_vi = dv.ma_don_vi
+        $where_sql
+        $order_sql
+    ";
+    $result_export = mysqli_query($conn, $sql_export);
+    
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=danh_sach_san_pham.csv');
+    echo "\xEF\xBB\xBF"; // BOM for Excel UTF-8
+    
+    $output = fopen('php://output', 'w');
+    fputcsv($output, array('Mã SP', 'Tên sản phẩm', 'Danh mục', 'Nhà cung cấp', 'Giá bán', 'Tồn kho', 'Đã bán', 'Đơn vị tính'));
+    
+    while ($row = mysqli_fetch_assoc($result_export)) {
+        fputcsv($output, array(
+            $row['ma_san_pham'],
+            $row['ten_san_pham'],
+            $row['ten_danh_muc'] ?? 'Chưa phân loại',
+            $row['ten_ncc'] ?? 'Chưa rõ',
+            $row['gia'],
+            $row['ton_kho'],
+            $row['so_luong_ban'],
+            $row['ten_don_vi'] ?? 'Cái'
+        ));
+    }
+    fclose($output);
+    exit();
+}
+
+// Cấu hình Phân trang
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page <= 0) $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Lấy tổng số dòng để tính số trang
+$count_sql = "SELECT COUNT(*) as total FROM san_pham sp $where_sql";
+$count_result = mysqli_query($conn, $count_sql);
+$total_rows = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($total_rows / $limit);
+
+// Truy vấn danh sách sản phẩm (có áp dụng Filter, Sort & Phân trang)
 $sql = "
     SELECT sp.*, dm.ten_danh_muc, ncc.ten_ncc, dv.ten_don_vi 
     FROM san_pham sp 
@@ -44,6 +92,7 @@ $sql = "
     LEFT JOIN don_vi dv ON sp.ma_don_vi = dv.ma_don_vi
     $where_sql
     $order_sql
+    LIMIT $limit OFFSET $offset
 ";
 
 $result = mysqli_query($conn, $sql);
@@ -56,11 +105,35 @@ include '../../includes/sidebar.php';
     <h1 class="box-title">Quản lý Sản phẩm</h1>
     
     <?php if (isset($_GET['message'])): ?>
-        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['message']); ?></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: '<?php echo htmlspecialchars($_GET['message']); ?>',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            });
+        </script>
     <?php endif; ?>
     
     <?php if (isset($_GET['error'])): ?>
-        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: '<?php echo htmlspecialchars($_GET['error']); ?>',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            });
+        </script>
     <?php endif; ?>
 
     <form action="index.php" method="GET">
@@ -114,7 +187,20 @@ include '../../includes/sidebar.php';
                     <i class="fas fa-search"></i>
                     <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Tìm kiếm tên, mã SP (Nhấn Enter)...">
                 </div>
-                <div class="inner-button-create">
+                <style>
+                    .inner-button-create a.btn-export-csv {
+                        background-color: #107c41 !important;
+                        border-color: #107c41 !important;
+                    }
+                    .inner-button-create a.btn-export-csv:hover {
+                        background-color: #0b5e31 !important;
+                        border-color: #0b5e31 !important;
+                    }
+                </style>
+                <div class="inner-button-create" style="display: flex; gap: 10px;">
+                    <a href="javascript:void(0);" onclick="exportCSV(this)" class="btn-export-csv" style="text-decoration: none;">
+                        <i class="fas fa-file-excel" style="margin-right: 8px;"></i> Xuất CSV
+                    </a>
                     <a href="create.php" style="text-decoration: none;"><i class="fas fa-plus" style="margin-right: 8px;"></i> Thêm sản phẩm</a>
                 </div>
             </div>
@@ -163,7 +249,7 @@ include '../../includes/sidebar.php';
                             <td class="inner-center">
                                 <div class="inner-buttons">
                                     <a href="edit.php?id=<?php echo $row['ma_san_pham']; ?>" class="inner-edit"><i class="fas fa-edit"></i></a>
-                                    <a href="delete.php?id=<?php echo $row['ma_san_pham']; ?>" class="inner-delete" onclick="return confirm('Bạn có chắc chắn muốn xoá sản phẩm này?');"><i class="fas fa-trash"></i></a>
+                                    <a href="javascript:void(0);" class="inner-delete" onclick="confirmDelete(<?php echo $row['ma_san_pham']; ?>)"><i class="fas fa-trash"></i></a>
                                 </div>
                             </td>
                         </tr>
@@ -174,6 +260,63 @@ include '../../includes/sidebar.php';
             </tbody>
         </table>
     </div>
+
+    <!-- Hiển thị phân trang -->
+    <?php if ($total_pages > 1): ?>
+    <div class="pagination" style="display: flex; justify-content: flex-end; margin-top: 20px; gap: 5px;">
+        <?php
+        // Giữ lại các filter hiện tại khi chuyển trang
+        $query_params = $_GET;
+        unset($query_params['page']);
+        $base_query_string = http_build_query($query_params);
+        $base_url = "index.php?" . ($base_query_string ? $base_query_string . "&" : "");
+
+        if ($page > 1) {
+            echo '<a href="'.$base_url.'page='.($page-1).'" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #333;"><i class="fas fa-chevron-left"></i></a>';
+        }
+        
+        for ($i = 1; $i <= $total_pages; $i++) {
+            $active_style = ($i == $page) ? 'background: #4880FF; color: white; border-color: #4880FF;' : 'background: white; color: #333; border: 1px solid #ddd;';
+            echo '<a href="'.$base_url.'page='.$i.'" style="padding: 8px 12px; border-radius: 4px; text-decoration: none; '.$active_style.'">'.$i.'</a>';
+        }
+        
+        if ($page < $total_pages) {
+            echo '<a href="'.$base_url.'page='.($page+1).'" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #333;"><i class="fas fa-chevron-right"></i></a>';
+        }
+        ?>
+    </div>
+    <?php endif; ?>
 </main>
+
+<script>
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Bạn có chắc chắn?',
+        text: "Sản phẩm này và lịch sử giá sẽ bị xóa vĩnh viễn!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#F93C65',
+        cancelButtonColor: '#979797',
+        confirmButtonText: 'Đúng, xóa nó!',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'delete.php?id=' + id;
+        }
+    });
+}
+
+function exportCSV(btn) {
+    let form = btn.closest('form');
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'export';
+    input.value = 'csv';
+    form.appendChild(input);
+    form.submit();
+    // Xóa input sau khi submit để không ảnh hưởng nút tìm kiếm thông thường
+    setTimeout(() => input.remove(), 100);
+}
+</script>
 
 <?php include '../../includes/footer.php'; ?>

@@ -17,6 +17,9 @@ $base_url = "/bai3php/";
     
     <!-- Main JS -->
     <script src="<?php echo $base_url; ?>assets/js/main.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 

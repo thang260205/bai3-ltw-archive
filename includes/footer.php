@@ -41,6 +41,19 @@
                     });
                 });
             }
+
+            // 4. Lưu và phục hồi vị trí cuộn (Scroll Position) cho trang danh sách
+            if (window.location.pathname.includes('index.php')) {
+                const scrollKey = 'scrollPos_' + window.location.pathname;
+                const scrollPos = sessionStorage.getItem(scrollKey);
+                if (scrollPos) {
+                    window.scrollTo(0, parseInt(scrollPos));
+                    sessionStorage.removeItem(scrollKey);
+                }
+                window.addEventListener('beforeunload', function() {
+                    sessionStorage.setItem(scrollKey, window.scrollY);
+                });
+            }
         });
     </script>
 </body>

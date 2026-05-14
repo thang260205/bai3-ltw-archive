@@ -3,7 +3,7 @@ include '../../config/database.php';
 /** @var mysqli $conn */
 
 $error = '';
-$success = '';
+$success = isset($_GET['success']) ? 'Thêm danh mục thành công!' : '';
 
 if (isset($_POST['btn_save'])) {
     $ten_danh_muc = mysqli_real_escape_string($conn, trim($_POST['ten_danh_muc']));
@@ -16,8 +16,8 @@ if (isset($_POST['btn_save'])) {
         $sql = "INSERT INTO danh_muc (ten_danh_muc, mo_ta) VALUES ('$ten_danh_muc', '$mo_ta')";
         
         if (mysqli_query($conn, $sql)) {
-            $success = "Thêm danh mục thành công!";
-            header("Refresh: 1; url=index.php");
+            header("Location: create.php?success=1");
+            exit();
         } else {
             $error = "Lỗi: " . mysqli_error($conn);
         }
@@ -57,7 +57,7 @@ include '../../includes/sidebar.php';
             
             <div class="form-actions">
                 <button type="submit" name="btn_save" class="btn btn-primary">Lưu danh mục</button>
-                <a href="index.php" class="btn btn-secondary">Hủy</a>
+                <a href="index.php" class="btn btn-secondary">Quay về danh sách</a>
             </div>
         </form>
     </div>

@@ -122,9 +122,9 @@ function getLastError(mysqli $conn): string {
  */
 function uploadToCloudinary($file_tmp) {
     // THAY THẾ BẰNG THÔNG TIN CLOUDINARY CỦA BẠN
-    $cloud_name = 'YOUR_CLOUD_NAME';
-    $api_key    = 'YOUR_API_KEY';
-    $api_secret = 'YOUR_API_SECRET';
+    $cloud_name = 'dknfvtsse';
+    $api_key    = '999621967499792';
+    $api_secret = 'gp5ZVx5EGbQOwouzboG1uE9-duw';
 
     $timestamp = time();
     $signature = sha1("timestamp=" . $timestamp . $api_secret);

@@ -13,7 +13,7 @@ $sql_units = "SELECT * FROM don_vi ORDER BY ten_don_vi";
 $result_units = mysqli_query($conn, $sql_units);
 
 $error = '';
-$success = '';
+$success = isset($_GET['success']) ? 'Thêm sản phẩm thành công!' : '';
 
 if (isset($_POST['btn_save'])) {
     $ten_san_pham = mysqli_real_escape_string($conn, trim($_POST['ten_san_pham']));
@@ -67,8 +67,8 @@ if (isset($_POST['btn_save'])) {
                 VALUES ('$ten_san_pham', '$gia', '$ton_kho', '$mo_ta', '$hinh_anh', $ma_danh_muc, $ma_ncc, $ma_don_vi)";
         
         if (mysqli_query($conn, $sql)) {
-            $success = "Thêm sản phẩm thành công!";
-            header("Refresh: 1; url=index.php");
+            header("Location: create.php?success=1");
+            exit();
         } else {
             $error = "Lỗi: " . mysqli_error($conn);
         }
@@ -159,7 +159,7 @@ include '../../includes/sidebar.php';
             
             <div class="form-actions">
                 <button type="submit" name="btn_save" class="btn btn-primary">Lưu sản phẩm</button>
-                <a href="index.php" class="btn btn-secondary">Hủy</a>
+                <a href="index.php" class="btn btn-secondary">Quay về danh sách</a>
             </div>
         </form>
     </div>

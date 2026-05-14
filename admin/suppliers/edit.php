@@ -22,7 +22,7 @@ if (!$result || mysqli_num_rows($result) == 0) {
 $supplier = mysqli_fetch_assoc($result);
 
 $error = '';
-$success = '';
+$success = isset($_GET['success']) ? 'Cập nhật nhà cung cấp thành công!' : '';
 
 if (isset($_POST['btn_save'])) {
     $ten_ncc = mysqli_real_escape_string($conn, trim($_POST['ten_ncc']));
@@ -36,8 +36,8 @@ if (isset($_POST['btn_save'])) {
         $sql = "UPDATE nha_cung_cap SET ten_ncc = '$ten_ncc', so_dien_thoai = '$so_dien_thoai', dia_chi = '$dia_chi' WHERE ma_ncc = $id";
         
         if (mysqli_query($conn, $sql)) {
-            $success = "Cập nhật nhà cung cấp thành công!";
-            header("Refresh: 1; url=index.php");
+            header("Location: edit.php?id=$id&success=1");
+            exit();
         } else {
             $error = "Lỗi: " . mysqli_error($conn);
         }
@@ -81,7 +81,7 @@ include '../../includes/sidebar.php';
             
             <div class="form-actions">
                 <button type="submit" name="btn_save" class="btn btn-primary">Lưu thay đổi</button>
-                <a href="index.php" class="btn btn-secondary">Hủy</a>
+                <a href="index.php" class="btn btn-secondary">Quay về danh sách</a>
             </div>
         </form>
     </div>

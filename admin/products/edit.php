@@ -32,7 +32,7 @@ $sql_units = "SELECT * FROM don_vi ORDER BY ten_don_vi";
 $result_units = mysqli_query($conn, $sql_units);
 
 $error = '';
-$success = '';
+$success = isset($_GET['success']) ? 'Cập nhật sản phẩm thành công!' : '';
 
 if (isset($_POST['btn_save'])) {
     $ten_san_pham = mysqli_real_escape_string($conn, trim($_POST['ten_san_pham']));
@@ -99,13 +99,13 @@ if (isset($_POST['btn_save'])) {
                 WHERE ma_san_pham = $id";
         
         if (mysqli_query($conn, $sql)) {
-            $success = "Cập nhật sản phẩm thành công!";
             // Cập nhật lịch sử giá nếu giá thay đổi
             if ($product['gia'] != $gia) {
                 $sql_price_history = "INSERT INTO lich_su_gia (ma_san_pham, gia_cu, gia_moi) VALUES ($id, {$product['gia']}, '$gia')";
                 mysqli_query($conn, $sql_price_history);
             }
-            header("Refresh: 1; url=index.php");
+            header("Location: edit.php?id=$id&success=1");
+            exit();
         } else {
             $error = "Lỗi: " . mysqli_error($conn);
         }
@@ -208,7 +208,7 @@ include '../../includes/sidebar.php';
             
             <div class="form-actions">
                 <button type="submit" name="btn_save" class="btn btn-primary">Lưu thay đổi</button>
-                <a href="index.php" class="btn btn-secondary">Hủy</a>
+                <a href="index.php" class="btn btn-secondary">Quay về danh sách</a>
             </div>
         </form>
     </div>

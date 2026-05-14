@@ -45,6 +45,14 @@ CREATE TABLE lich_su_gia (
     FOREIGN KEY (ma_san_pham) REFERENCES san_pham(ma_san_pham)
 );
 
+CREATE TABLE users (
+    ma_user INT AUTO_INCREMENT PRIMARY KEY,
+    ten_dang_nhap VARCHAR(50) NOT NULL UNIQUE,
+    mat_khau VARCHAR(255) NOT NULL,
+    ho_ten VARCHAR(100),
+    ngay_tao DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- -- Dữ liệu mẫu don_vi
 -- INSERT INTO don_vi (ten_don_vi) VALUES ('Cái'), ('Hộp'), ('Kg'), ('Lít'), ('Chiếc');
 

@@ -1,4 +1,8 @@
 <?php
-// Chuyển hướng trực tiếp vào trang quản trị (đã bỏ đăng nhập)
-header("Location: admin/dashboard.php");
+session_start();
+if (isset($_SESSION['user_logged_in'])) {
+    header("Location: admin/dashboard.php");
+} else {
+    header("Location: login.php");
+}
 exit();

@@ -34,7 +34,7 @@ $base_url = "/bai3php/";
                 <img src="https://ui-avatars.com/api/?name=Admin&background=4880FF&color=fff" alt="Avatar">
             </div>
             <div class="inner-text">
-                <div class="inner-name">Administrator</div>
+                <div class="inner-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Administrator'); ?></div>
                 <div class="inner-role">Quản trị viên</div>
             </div>
         </div>

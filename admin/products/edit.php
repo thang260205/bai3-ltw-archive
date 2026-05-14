@@ -38,6 +38,7 @@ if (isset($_POST['btn_save'])) {
     $ten_san_pham = mysqli_real_escape_string($conn, trim($_POST['ten_san_pham']));
     $gia = mysqli_real_escape_string($conn, trim($_POST['gia']));
     $ton_kho = mysqli_real_escape_string($conn, trim($_POST['ton_kho']));
+    $so_luong_ban = isset($_POST['so_luong_ban']) ? intval($_POST['so_luong_ban']) : 0;
     $mo_ta = mysqli_real_escape_string($conn, trim($_POST['mo_ta']));
     $ma_danh_muc = !empty($_POST['ma_danh_muc']) ? intval($_POST['ma_danh_muc']) : 'NULL';
     $ma_ncc = !empty($_POST['ma_ncc']) ? intval($_POST['ma_ncc']) : 'NULL';
@@ -91,6 +92,7 @@ if (isset($_POST['btn_save'])) {
                 ten_san_pham = '$ten_san_pham', 
                 gia = '$gia', 
                 ton_kho = '$ton_kho', 
+                so_luong_ban = $so_luong_ban,
                 mo_ta = '$mo_ta', 
                 hinh_anh = '$hinh_anh',
                 ma_danh_muc = $ma_danh_muc, 
@@ -145,6 +147,13 @@ include '../../includes/sidebar.php';
                     <label for="ton_kho">Tồn kho *</label>
                     <input type="number" id="ton_kho" name="ton_kho" required min="0" value="<?php echo htmlspecialchars($product['ton_kho']); ?>">
                 </div>
+                <div class="form-col">
+                    <label for="so_luong_ban">Số lượng đã bán</label>
+                    <input type="number" id="so_luong_ban" name="so_luong_ban" min="0" value="<?php echo htmlspecialchars($product['so_luong_ban']); ?>">
+                </div>
+            </div>
+            
+            <div class="form-row">
                 <div class="form-col">
                     <label for="ma_danh_muc">Danh mục</label>
                     <select id="ma_danh_muc" name="ma_danh_muc">

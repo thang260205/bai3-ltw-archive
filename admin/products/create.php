@@ -67,6 +67,11 @@ if (isset($_POST['btn_save'])) {
                 VALUES ('$ten_san_pham', '$gia', '$ton_kho', '$mo_ta', '$hinh_anh', $ma_danh_muc, $ma_ncc, $ma_don_vi)";
         
         if (mysqli_query($conn, $sql)) {
+            // Ghi nhận ngay mức giá đầu tiên vào lịch sử
+            $new_product_id = mysqli_insert_id($conn);
+            $sql_history = "INSERT INTO lich_su_gia (ma_san_pham, gia_cu, gia_moi) VALUES ($new_product_id, $gia, $gia)";
+            mysqli_query($conn, $sql_history);
+            
             header("Location: create.php?success=1");
             exit();
         } else {

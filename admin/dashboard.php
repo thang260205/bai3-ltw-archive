@@ -18,6 +18,17 @@ $low_stock = mysqli_fetch_assoc(mysqli_query($conn, $sql_low_stock))['total'] ??
 $sql_top_products = "SELECT sp.*, dm.ten_danh_muc FROM san_pham sp LEFT JOIN danh_muc dm ON sp.ma_danh_muc = dm.ma_danh_muc ORDER BY sp.so_luong_ban DESC LIMIT 10";
 $res_top_products = mysqli_query($conn, $sql_top_products);
 
+// Lấy toàn bộ sản phẩm để hiển thị trong dropdown (kể cả chưa có lịch sử giá)
+$sql_all_products = "SELECT ma_san_pham, ten_san_pham, gia FROM san_pham ORDER BY ten_san_pham ASC";
+$res_all_products = mysqli_query($conn, $sql_all_products);
+$all_products = [];
+while ($row = mysqli_fetch_assoc($res_all_products)) {
+    $all_products[$row['ma_san_pham']] = [
+        'name' => $row['ten_san_pham'],
+        'gia' => $row['gia']
+    ];
+}
+
 // Lấy dữ liệu lịch sử giá cho biểu đồ
 $sql_history = "SELECT lsg.ma_san_pham, sp.ten_san_pham, lsg.gia_cu, lsg.gia_moi, DATE_FORMAT(lsg.ngay_thay_doi, '%d/%m/%Y %H:%i') as ngay
                 FROM lich_su_gia lsg
@@ -26,23 +37,35 @@ $sql_history = "SELECT lsg.ma_san_pham, sp.ten_san_pham, lsg.gia_cu, lsg.gia_moi
 $res_history = mysqli_query($conn, $sql_history);
 
 $history_data = [];
-$products_with_history = [];
 
 if ($res_history) {
     while ($row = mysqli_fetch_assoc($res_history)) {
         $id = $row['ma_san_pham'];
         if (!isset($history_data[$id])) {
-            $history_data[$id] = ['name' => $row['ten_san_pham'], 'labels' => ['Trước khi đổi'], 'prices' => [$row['gia_cu']]];
-            $products_with_history[$id] = $row['ten_san_pham'];
+            $history_data[$id] = ['name' => $row['ten_san_pham'], 'labels' => ['Khởi tạo'], 'prices' => [$row['gia_cu']]];
         }
         $history_data[$id]['labels'][] = $row['ngay'];
         $history_data[$id]['prices'][] = $row['gia_moi'];
     }
 }
 
+// Bổ sung những sản phẩm chưa có lịch sử giá vào mảng data để biểu đồ không bị lỗi
+foreach ($all_products as $id => $prod) {
+    if (!isset($history_data[$id])) {
+        $history_data[$id] = [
+            'name' => $prod['name'],
+            'labels' => ['Hiện tại'],
+            'prices' => [$prod['gia']]
+        ];
+    }
+}
+
 include '../includes/header.php';
 include '../includes/sidebar.php';
 ?>
+
+<!-- Thư viện Tom Select cho Dropdown tìm kiếm -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 
 <main class="main">
     <h1 class="box-title">Tổng quan hệ thống</h1>
@@ -82,21 +105,21 @@ include '../includes/sidebar.php';
     <div class="section-2">
         <div class="inner-head">
             <h2 class="inner-title">Biểu đồ Lịch sử giá</h2>
-            <div class="inner-filter">
-                <select id="productSelect" style="height: 35px; border: 1px solid #D5D5D5; border-radius: 4px; padding: 0 10px; font-weight: 600; outline: none; cursor: pointer; max-width: 250px;">
-                    <?php if (empty($products_with_history)): ?>
+            <div class="inner-filter" style="min-width: 300px;">
+                <select id="productSelect" placeholder="Nhập để tìm sản phẩm...">
+                    <?php if (empty($all_products)): ?>
                         <option value="">Chưa có dữ liệu</option>
                     <?php else: ?>
-                        <option value="">-- Chọn sản phẩm --</option>
-                        <?php foreach ($products_with_history as $id => $name): ?>
-                            <option value="<?php echo $id; ?>"><?php echo htmlspecialchars($name); ?></option>
+                        <option value="">-- Gõ để tìm kiếm --</option>
+                        <?php foreach ($all_products as $id => $prod): ?>
+                            <option value="<?php echo $id; ?>"><?php echo htmlspecialchars($prod['name']); ?></option>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </select>
             </div>
         </div>
         <div class="inner-chart">
-            <?php if (empty($products_with_history)): ?>
+            <?php if (empty($all_products)): ?>
                 <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #999; font-weight: 600;">
                     Hãy thay đổi giá sản phẩm để xem biểu đồ biến động
                 </div>
@@ -154,8 +177,9 @@ include '../includes/sidebar.php';
     </div>
 </main>
 
-<?php if (!empty($products_with_history)): ?>
+<?php if (!empty($all_products)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
     const historyData = <?php echo json_encode($history_data); ?>;
     const ctx = document.getElementById('priceChart').getContext('2d');
@@ -222,6 +246,12 @@ include '../includes/sidebar.php';
 
     // Khởi tạo biểu đồ
     renderChart();
+
+    // Khởi tạo Tom Select để ô select có thể gõ tìm kiếm
+    new TomSelect("#productSelect", {
+        create: false,
+        sortField: { field: "text", direction: "asc" }
+    });
 
     // Lắng nghe sự kiện thay đổi sản phẩm trên dropdown
     document.getElementById('productSelect').addEventListener('change', function() {

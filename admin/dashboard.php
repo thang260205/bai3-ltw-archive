@@ -101,34 +101,6 @@ include '../includes/sidebar.php';
         </div>
     </div>
 
-    <!-- Biểu đồ lịch sử giá -->
-    <div class="section-2">
-        <div class="inner-head">
-            <h2 class="inner-title">Biểu đồ Lịch sử giá</h2>
-            <div class="inner-filter" style="min-width: 300px;">
-                <select id="productSelect" placeholder="Nhập để tìm sản phẩm...">
-                    <?php if (empty($all_products)): ?>
-                        <option value="">Chưa có dữ liệu</option>
-                    <?php else: ?>
-                        <option value="">-- Gõ để tìm kiếm --</option>
-                        <?php foreach ($all_products as $id => $prod): ?>
-                            <option value="<?php echo $id; ?>"><?php echo htmlspecialchars($prod['name']); ?></option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-            </div>
-        </div>
-        <div class="inner-chart">
-            <?php if (empty($all_products)): ?>
-                <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #999; font-weight: 600;">
-                    Hãy thay đổi giá sản phẩm để xem biểu đồ biến động
-                </div>
-            <?php else: ?>
-                <canvas id="priceChart"></canvas>
-            <?php endif; ?>
-        </div>
-    </div>
-
     <!-- Bảng sản phẩm bán chạy -->
     <div class="section-3">
         <h2 class="inner-title">Top 10 Sản Phẩm Bán Chạy</h2>

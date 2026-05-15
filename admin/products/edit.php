@@ -21,7 +21,6 @@ if (!$result || mysqli_num_rows($result) == 0) {
 
 $product = mysqli_fetch_assoc($result);
 
-// Lấy danh sách danh mục, nhà cung cấp, đơn vị tính
 $sql_categories = "SELECT * FROM danh_muc ORDER BY ten_danh_muc";
 $result_categories = mysqli_query($conn, $sql_categories);
 

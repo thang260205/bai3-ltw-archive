@@ -2,11 +2,9 @@
 include '../../config/database.php';
 /** @var mysqli $conn */
 
-// Lấy danh sách danh mục và nhà cung cấp cho dropdown filter
 $res_categories = mysqli_query($conn, "SELECT ma_danh_muc, ten_danh_muc FROM danh_muc ORDER BY ten_danh_muc");
 $res_suppliers = mysqli_query($conn, "SELECT ma_ncc, ten_ncc FROM nha_cung_cap ORDER BY ten_ncc");
 
-// Tiếp nhận các tham số lọc từ URL (GET)
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $category_id = isset($_GET['category']) ? intval($_GET['category']) : 0;
 $supplier_id = isset($_GET['supplier']) ? intval($_GET['supplier']) : 0;
@@ -83,7 +81,6 @@ $count_result = mysqli_query($conn, $count_sql);
 $total_rows = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_rows / $limit);
 
-// Truy vấn danh sách sản phẩm (có áp dụng Filter, Sort & Phân trang)
 $sql = "
     SELECT sp.*, dm.ten_danh_muc, ncc.ten_ncc, dv.ten_don_vi 
     FROM san_pham sp 
@@ -300,7 +297,7 @@ function confirmDeleteForm(btn) {
         showCancelButton: true,
         confirmButtonColor: '#F93C65',
         cancelButtonColor: '#979797',
-        confirmButtonText: 'Đúng, xóa nó!',
+        confirmButtonText: 'Xác nhận xóa',
         cancelButtonText: 'Hủy'
     }).then((result) => {
         if (result.isConfirmed) {
